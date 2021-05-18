@@ -41,6 +41,10 @@ public class TDProps {
 
 		comment = "If TRUE, Ducts will display debug information where applicable.";
 		showDebugInfo = ThermalDynamics.CONFIG.getConfiguration().getBoolean("ShowDebugInfo", category, showDebugInfo, comment);
+
+		/* CONNECTION BLACKLIST */
+		comment = "List of blocks that ducts are not allowed to connect to.";
+		connectionBlacklist = ThermalDynamics.CONFIG.getConfiguration().getStringList("ConnectionBlacklist", "Connection Blacklist", connectionBlacklist, comment);
 	}
 
 	private static void configClient() {
@@ -160,6 +164,9 @@ public class TDProps {
 	public static final int MAX_STUFFED_ITEMSTACKS_DROP = 30;
 
 	public static boolean showDebugInfo = false;
+
+	/* CONNECTION BLACKLIST */
+	public static String[] connectionBlacklist = new String[]{};
 
 	/* TEXTURES */
 	public static final String PATH_GFX = "thermaldynamics:textures/";

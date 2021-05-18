@@ -14,6 +14,7 @@ import cofh.core.util.RayTracer;
 import cofh.core.util.helpers.BlockHelper;
 import cofh.core.util.helpers.ServerHelper;
 import cofh.core.util.helpers.WrenchHelper;
+import cofh.thermaldynamics.ThermalDynamics;
 import cofh.thermaldynamics.block.BlockDuct;
 import cofh.thermaldynamics.duct.Attachment;
 import cofh.thermaldynamics.duct.AttachmentRegistry;
@@ -46,6 +47,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -54,14 +56,14 @@ import org.apache.commons.lang3.Validate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static cofh.thermaldynamics.duct.ConnectionType.*;
 
 public abstract class TileGrid extends TileCore implements IDuctHolder, IPortableData, ITileInfoPacketHandler, ITilePacketHandler, ICustomHitBox, ITileInfo {
+
+	public static List<String> blockedConnections = Arrays.asList(ThermalDynamics.CONFIG.getConfiguration().getStringList("ConnectionBlacklist", "Connection Blacklist", TDProps.connectionBlacklist, "List of blocks that ducts are not allowed to connect to."));
+
 
 	static final int ATTACHMENT_SUB_HIT = 14;
 	static final int COVER_SUB_HIT = 20;
@@ -179,6 +181,16 @@ public abstract class TileGrid extends TileCore implements IDuctHolder, IPortabl
 			tiles[i] = adjacentTileEntity;
 			if (adjacentTileEntity instanceof IDuctHolder) {
 				holders[i] = (IDuctHolder) adjacentTileEntity;
+			} else if (adjacentTileEntity != null) {
+				if (blockedConnections.size() > 0) {
+					for (String blockedConnection : blockedConnections) {
+						if (adjacentTileEntity.getBlockType() == ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockedConnection))) {
+							if (getConnectionType(i) != BLOCKED) {
+								setConnectionType(i, BLOCKED);
+							}
+						}
+					}
+				}
 			} else if (adjacentTileEntity == null && connectionTypes != null) {
 				if (getConnectionType(i) == BLOCKED) {
 					setConnectionType(i, NORMAL);

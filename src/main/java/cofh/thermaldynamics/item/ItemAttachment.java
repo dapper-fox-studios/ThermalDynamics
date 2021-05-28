@@ -14,9 +14,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -36,6 +38,19 @@ public abstract class ItemAttachment extends Item implements IInitializer, IMode
 		Attachment attachment = getAttachment(stack, player, world, pos, facing);
 
 		if (attachment != null && attachment.addToTile()) {
+
+			TileEntity aboveTileEntity = BlockHelper.getAdjacentTileEntity(attachment.baseTile, EnumFacing.UP);
+			if (aboveTileEntity != null && TileGrid.blockedConnections.size() > 0 && facing.equals(EnumFacing.UP)) {
+				for (String blockedConnection : TileGrid.blockedConnections) {
+					if (aboveTileEntity.getBlockType() == ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockedConnection))) {
+						attachment.baseTile.removeAttachment(attachment);
+						for (ItemStack _stack : attachment.getDrops()) {
+							attachment.dropItemStack(_stack);
+						}
+					}
+				}
+			}
+
 			if (!player.capabilities.isCreativeMode) {
 				stack.shrink(1);
 			}

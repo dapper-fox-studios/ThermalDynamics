@@ -38,19 +38,6 @@ public abstract class ItemAttachment extends Item implements IInitializer, IMode
 		Attachment attachment = getAttachment(stack, player, world, pos, facing);
 
 		if (attachment != null && attachment.addToTile()) {
-
-			TileEntity aboveTileEntity = BlockHelper.getAdjacentTileEntity(attachment.baseTile, EnumFacing.UP);
-			if (aboveTileEntity != null && TileGrid.blockedConnections.size() > 0 && facing.equals(EnumFacing.UP)) {
-				for (String blockedConnection : TileGrid.blockedConnections) {
-					if (aboveTileEntity.getBlockType() == ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockedConnection))) {
-						attachment.baseTile.removeAttachment(attachment);
-						for (ItemStack _stack : attachment.getDrops()) {
-							attachment.dropItemStack(_stack);
-						}
-					}
-				}
-			}
-
 			if (!player.capabilities.isCreativeMode) {
 				stack.shrink(1);
 			}

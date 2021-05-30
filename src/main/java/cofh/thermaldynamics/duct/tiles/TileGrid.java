@@ -181,19 +181,32 @@ public abstract class TileGrid extends TileCore implements IDuctHolder, IPortabl
 			tiles[i] = adjacentTileEntity;
 			if (adjacentTileEntity instanceof IDuctHolder) {
 				holders[i] = (IDuctHolder) adjacentTileEntity;
+			} else if (adjacentTileEntity == null && connectionTypes != null) {
+				if (getConnectionType(i) == BLOCKED) {
+					setConnectionType(i, NORMAL);
+				}
 			} else if (adjacentTileEntity != null) {
 				if (blockedConnections.size() > 0) {
 					for (String blockedConnection : blockedConnections) {
 						if (adjacentTileEntity.getBlockType() == ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockedConnection))) {
+							if (attachmentData != null) {
+								Attachment attachment = attachmentData.attachments[i];
+
+								if (attachment != null) {
+									removeAttachment(attachment);
+									System.out.println(attachment.getDrops());
+									for (ItemStack stack : attachment.getDrops()) {
+										System.out.println(stack);
+										attachment.dropItemStack(stack);
+									}
+								}
+							}
+
 							if (getConnectionType(i) != BLOCKED) {
 								setConnectionType(i, BLOCKED);
 							}
 						}
 					}
-				}
-			} else if (adjacentTileEntity == null && connectionTypes != null) {
-				if (getConnectionType(i) == BLOCKED) {
-					setConnectionType(i, NORMAL);
 				}
 			}
 		}

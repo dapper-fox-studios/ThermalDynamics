@@ -194,9 +194,7 @@ public abstract class TileGrid extends TileCore implements IDuctHolder, IPortabl
 
 								if (attachment != null) {
 									removeAttachment(attachment);
-									System.out.println(attachment.getDrops());
 									for (ItemStack stack : attachment.getDrops()) {
-										System.out.println(stack);
 										attachment.dropItemStack(stack);
 									}
 								}
